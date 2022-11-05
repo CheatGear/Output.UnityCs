@@ -50,6 +50,7 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
     public override string OutputName => "CSharp";
     public override EngineType SupportedEngines => EngineType.Unity;
     public override OutputProps SupportedProps => OutputProps.Internal | OutputProps.External;
+
     public override IReadOnlyDictionary<Enum, OutputOption> Options { get; } = new Dictionary<Enum, OutputOption>()
     {
         {
