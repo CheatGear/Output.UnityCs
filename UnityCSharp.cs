@@ -64,6 +64,11 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
         },
     };
 
+    public UnityCSharp()
+    {
+        _cSharpProcessor = new CSharpProcessor();
+    }
+    
     private string FixArrayTypeName(string type)
     {
         if (type.EndsWith("_Array"))
@@ -255,7 +260,6 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
     {
         ArgumentNullException.ThrowIfNull(SdkFile);
 
-        _cSharpProcessor = new CSharpProcessor();
         var cSharpOpts = new CSharpLangOptions()
         {
             NewLine = NewLineType.CRLF,
