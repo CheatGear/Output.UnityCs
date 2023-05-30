@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CG.Framework.Attributes;
-using CG.Framework.Engines;
-using CG.Framework.Engines.Models;
-using CG.Framework.Engines.Unity;
-using CG.Framework.Helper;
-using CG.Framework.Helper.IO;
-using CG.Framework.Plugin.Output;
 using CG.Output.UnityCSharp.Helper;
+using CG.SDK.Dotnet.Attributes;
+using CG.SDK.Dotnet.Engine;
+using CG.SDK.Dotnet.Engine.Models;
+using CG.SDK.Dotnet.Engine.Unity;
+using CG.SDK.Dotnet.Helper;
+using CG.SDK.Dotnet.Helper.IO;
+using CG.SDK.Dotnet.Plugin.Output;
 using LangPrint;
 using LangPrint.CSharp;
 
@@ -22,53 +22,73 @@ internal enum CppOptions
     PrecompileSyntax
 }
 
-[PluginInfo("CorrM", "UnityCSharp", "CSharp syntax support for Unity", "https://github.com/CheatGear", "https://github.com/CheatGear/Output.UnityCs")]
+[PluginInfo(Name = nameof(UnityCSharp), Version = "5.0.0", Author = "CorrM", Description = "CSharp syntax support for Unity", WebsiteLink = "https://github.com/CheatGear", SourceCodeLink = "https://github.com/CheatGear/Output.UnityCs")]
 public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
 {
-    private CSharpProcessor _cSharpProcessor;
+    private readonly CSharpProcessor _cSharpProcessor;
 
     protected override Dictionary<string, string> LangTypes { get; } = new()
     {
-        { "int64_t", "long" },
-        { "int32_t", "int" },
-        { "int16_t", "short" },
-        { "int8_t", "sbyte" },
+        {
+            "int64_t", "long"
+        },
+        {
+            "int32_t", "int"
+        },
+        {
+            "int16_t", "short"
+        },
+        {
+            "int8_t", "sbyte"
+        },
 
-        { "uint64_t", "ulong" },
-        { "uint32_t", "uint" },
-        { "uint16_t", "ushort" },
-        { "uint8_t", "byte" },
+        {
+            "uint64_t", "ulong"
+        },
+        {
+            "uint32_t", "uint"
+        },
+        {
+            "uint16_t", "ushort"
+        },
+        {
+            "uint8_t", "byte"
+        },
 
-        { "intptr_t", "IntPtr" },
-        { "Il2CppString", "string" },
-        { "Il2CppObject", "Object" },
+        {
+            "intptr_t", "IntPtr"
+        },
+        {
+            "Il2CppString", "string"
+        },
+        {
+            "Il2CppObject", "Object"
+        }
     };
 
-    public override Version TargetFrameworkVersion { get; } = new(3, 1, 0);
-    public override Version PluginVersion { get; } = new(3, 1, 0);
-
     public override string OutputName => "CSharp";
-    public override EngineType SupportedEngines => EngineType.Unity;
-    public override OutputProps SupportedProps => OutputProps.Internal | OutputProps.External;
+
+    public override GameEngine SupportedEngines => GameEngine.Unity;
+
+    public override OutputPurpose SupportedPurpose => OutputPurpose.Internal | OutputPurpose.External;
 
     public override IReadOnlyDictionary<Enum, OutputOption> Options { get; } = new Dictionary<Enum, OutputOption>()
     {
         {
-            CppOptions.PrecompileSyntax,
-            new OutputOption(
+            CppOptions.PrecompileSyntax, new OutputOption(
                 "Precompile Syntax",
                 OutputOptionType.CheckBox,
                 "Use precompile headers for most build speed",
                 "true"
             )
-        },
+        }
     };
 
     public UnityCSharp()
     {
         _cSharpProcessor = new CSharpProcessor();
     }
-    
+
     private string FixArrayTypeName(string type)
     {
         if (type.EndsWith("_Array"))
@@ -199,11 +219,15 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
             Name = unityPack.Name,
             //BeforeNameSpace = $"#ifdef _MSC_VER{Environment.NewLine}\t#pragma pack(push, 0x{SdkFile.GlobalMemberAlignment:X2}){Environment.NewLine}#endif",
             //AfterNameSpace = $"#ifdef _MSC_VER{Environment.NewLine}\t#pragma pack(pop){Environment.NewLine}#endif",
-            HeadingComment = new List<string>() { $"Name: {SdkFile.GameName}", $"Version: {SdkFile.GameVersion}" },
+            HeadingComment = new List<string>()
+            {
+                $"Name: {SdkFile.GameName}",
+                $"Version: {SdkFile.GameVersion}"
+            },
             NameSpace = SdkFile.Namespace,
             Enums = GetEnums(unityPack).ToList(),
             Structs = structs,
-            Conditions = unityPack.Conditions,
+            Conditions = unityPack.Conditions
         };
 
         // Generate files
@@ -217,8 +241,8 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
     /// <summary>
     /// Process local files that needed to be included
     /// </summary>
-    /// <param name="processProps">Process props</param>
-    private ValueTask<Dictionary<string, string>> GenerateIncludesAsync(OutputProps processProps)
+    /// <param name="processPurpose">Process props</param>
+    private ValueTask<Dictionary<string, string>> GenerateIncludesAsync(OutputPurpose processPurpose)
     {
         var ret = new Dictionary<string, string>();
         return ValueTask.FromResult(ret);
@@ -298,7 +322,7 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
         return base.ToLangType(clearedType, onlySubOld);
     }
 
-    public override async ValueTask StartAsync(string saveDirPath, OutputProps processProps)
+    public override async ValueTask SaveAsync(string saveDirPath, OutputPurpose processPurpose)
     {
         var builder = new MyStringBuilder();
 
@@ -339,7 +363,7 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
         }
 
         // Includes
-        foreach ((string fName, string fContent) in await GenerateIncludesAsync(processProps).ConfigureAwait(false))
+        foreach ((string fName, string fContent) in await GenerateIncludesAsync(processPurpose).ConfigureAwait(false))
         {
             await FileManager.WriteAsync(saveDirPath, fName, fContent).ConfigureAwait(false);
 

@@ -2,8 +2,8 @@
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using CG.Framework.Engines.Models;
-using CG.Framework.Helper;
+using CG.SDK.Dotnet.Engine.Models;
+using CG.SDK.Dotnet.Helper;
 using LangPrint;
 using LangPrint.CSharp;
 
@@ -18,14 +18,14 @@ public static class LangPrintHelper
     /// <returns>Converted <see cref="CSharpStruct"/></returns>
     internal static CSharpAttribute ToCSharp(this EngineAttribute eAttr)
     {
-        string inlineComment = $"RVA: 0x{eAttr.RVA:X}, Offset: 0x{eAttr.Offset:X}, VA: 0x{eAttr.VA:X}";
+        string inlineComment = $"RVA: 0x{eAttr.Rva:X}, Offset: 0x{eAttr.Offset:X}, VA: 0x{eAttr.Va:X}";
 
         return new CSharpAttribute()
         {
             Name = eAttr.Name,
             Arguments = eAttr.Arguments,
             Conditions = eAttr.Conditions,
-            InlineComment = inlineComment,
+            InlineComment = inlineComment
         };
     }
 
@@ -45,7 +45,7 @@ public static class LangPrintHelper
             Values = eEnum.Values.Select(kv => new PackageNameValue() { Name = kv.Key, Value = kv.Value }).ToList(),
             HexValues = eEnum.HexValues,
             Conditions = eEnum.Conditions,
-            Comments = eEnum.Comments,
+            Comments = eEnum.Comments
         }.WithComment(new List<string>() { eEnum.FullName });
     }
 
@@ -79,7 +79,7 @@ public static class LangPrintHelper
             IsVolatile = (eField.Modifiers.DeclarationModifiers & EngineItemDeclarationModifier.Volatile) != 0,
             InlineComment = eField.Comment,
             Conditions = eField.Conditions,
-            Comments = eField.Comments,
+            Comments = eField.Comments
         }.WithInlineComment(inlineComment.ToString());
     }
 
@@ -115,7 +115,7 @@ public static class LangPrintHelper
             HaveSetter = eProp.HaveSetter,
             InlineComment = eProp.Comment,
             Conditions = eProp.Conditions,
-            Comments = eProp.Comments,
+            Comments = eProp.Comments
         }.WithInlineComment(inlineComment.ToString());
     }
 
@@ -133,7 +133,7 @@ public static class LangPrintHelper
             Type = param.Type,
             IsRef = param.IsReference,
             Conditions = param.Conditions,
-            Comments = param.Comments,
+            Comments = param.Comments
         };
     }
 
@@ -158,9 +158,9 @@ public static class LangPrintHelper
             comments = new List<string>()
             {
                 "Function:",
-                $"\t\tRVA    -> 0x{func.RVA:X8}",
+                $"\t\tRVA    -> 0x{func.Rva:X8}",
                 $"\t\tName   -> {func.FullName}",
-                $"\t\tFlags  -> ({func.FlagsString})",
+                $"\t\tFlags  -> ({func.FlagsString})"
             };
 
             if (@params.Count > 0)
@@ -193,7 +193,7 @@ public static class LangPrintHelper
             IsAsync = false,
             IsUnsafe = false,
             Conditions = func.Conditions,
-            Comments = func.Comments,
+            Comments = func.Comments
         }.WithComment(comments);
     }
 
