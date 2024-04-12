@@ -19,10 +19,11 @@ namespace CG.Output.UnityCSharp;
 
 internal enum CppOptions
 {
-    PrecompileSyntax
+    PrecompileSyntax,
 }
 
-[PluginInfo(Name = nameof(UnityCSharp),
+[PluginInfo(
+    Name = nameof(UnityCSharp),
     Version = "5.0.0",
     Author = "CorrM",
     Description = "CSharp syntax support for Unity",
@@ -33,21 +34,24 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
 {
     private readonly CSharpProcessor _cSharpProcessor;
 
+    public UnityCSharp()
+    {
+        _cSharpProcessor = new CSharpProcessor();
+    }
+
     protected override Dictionary<string, string> LangTypes { get; } = new()
     {
         { "int64_t", "long" },
         { "int32_t", "int" },
         { "int16_t", "short" },
         { "int8_t", "sbyte" },
-
         { "uint64_t", "ulong" },
         { "uint32_t", "uint" },
         { "uint16_t", "ushort" },
         { "uint8_t", "byte" },
-
         { "intptr_t", "IntPtr" },
         { "Il2CppString", "string" },
-        { "Il2CppObject", "Object" }
+        { "Il2CppObject", "Object" },
     };
 
     public override string OutputName => "CSharp";
@@ -56,7 +60,7 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
 
     public override OutputPurpose SupportedPurpose => OutputPurpose.Internal | OutputPurpose.External;
 
-    public override IReadOnlyDictionary<Enum, OutputOption> Options { get; } = new Dictionary<Enum, OutputOption>()
+    public override IReadOnlyDictionary<Enum, OutputOption> Options { get; } = new Dictionary<Enum, OutputOption>
     {
         {
             CppOptions.PrecompileSyntax, new OutputOption(
@@ -65,13 +69,8 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
                 "Use precompile headers for most build speed",
                 "true"
             )
-        }
+        },
     };
-
-    public UnityCSharp()
-    {
-        _cSharpProcessor = new CSharpProcessor();
-    }
 
     private string FixArrayTypeName(string type)
     {
@@ -172,7 +171,8 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
     {
         return enginePackage.Structs
             .Where(ec => !ec.IsSubType)
-            .Select(eStruct =>
+            .Select(
+                eStruct =>
                 {
                     PrepareStruct(eStruct);
                     return eStruct.ToCSharp();
@@ -184,7 +184,8 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
     {
         return enginePackage.Classes
             .Where(ec => !ec.IsSubType)
-            .Select(eStruct =>
+            .Select(
+                eStruct =>
                 {
                     PrepareStruct(eStruct);
                     return eStruct.ToCSharp();
@@ -193,7 +194,7 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
     }
 
     /// <summary>
-    /// Generate enginePackage files
+    ///     Generate enginePackage files
     /// </summary>
     /// <param name="unityPack">Package to generate files for</param>
     /// <returns>File name and its content</returns>
@@ -218,20 +219,16 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
         structs.AddRange(GetClasses(unityPack));
 
         // Make CppPackage
-        var cppPackage = new CSharpPackage()
+        var cppPackage = new CSharpPackage
         {
             Name = unityPack.Name,
             //BeforeNameSpace = $"#ifdef _MSC_VER{Environment.NewLine}\t#pragma pack(push, 0x{SdkFile.GlobalMemberAlignment:X2}){Environment.NewLine}#endif",
             //AfterNameSpace = $"#ifdef _MSC_VER{Environment.NewLine}\t#pragma pack(pop){Environment.NewLine}#endif",
-            HeadingComment =
-            [
-                $"Name: {SdkFile.GameName}",
-                $"Version: {SdkFile.GameVersion}"
-            ],
+            HeadingComment = [$"Name: {SdkFile.GameName}", $"Version: {SdkFile.GameVersion}"],
             NameSpace = SdkFile.Namespace,
             Enums = GetEnums(unityPack).ToList(),
             Structs = structs,
-            Conditions = unityPack.Conditions
+            Conditions = unityPack.Conditions,
         };
 
         // Generate files
@@ -245,7 +242,7 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
     }
 
     /// <summary>
-    /// Process local files that needed to be included
+    ///     Process local files that needed to be included
     /// </summary>
     /// <param name="processPurpose">Process props</param>
     private ValueTask<Dictionary<string, string>> GenerateIncludesAsync(OutputPurpose processPurpose)
@@ -290,13 +287,13 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
     {
         ArgumentNullException.ThrowIfNull(SdkFile);
 
-        var cSharpOpts = new CSharpLangOptions()
+        var cSharpOpts = new CSharpLangOptions
         {
             NewLine = NewLineType.CRLF,
             PrintSectionName = true,
             InlineCommentPadSize = 40,
             FieldMemberTypePadSize = 50,
-            GeneratePackageSyntax = false
+            GeneratePackageSyntax = false,
         };
         _cSharpProcessor.Init(cSharpOpts);
 
@@ -367,10 +364,11 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
             if (Status?.ProgressbarStatus is not null)
             {
                 await Status.ProgressbarStatus.Invoke(
-                    "",
-                    packCount,
-                    SdkFile.Packages.Count - packCount
-                ).ConfigureAwait(false);
+                        "",
+                        packCount,
+                        SdkFile.Packages.Count - packCount
+                    )
+                    .ConfigureAwait(false);
             }
 
             packCount++;

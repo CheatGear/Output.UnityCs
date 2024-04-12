@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using CG.SDK.Dotnet.Engine.Models;
-using CG.SDK.Dotnet.Helper;
 using LangPrint;
 using LangPrint.CSharp;
 
@@ -12,53 +11,51 @@ namespace CG.Output.UnityCSharp.Helper;
 public static class LangPrintHelper
 {
     /// <summary>
-    /// Convert <see cref="EngineAttribute"/> to <see cref="CSharpAttribute"/>
+    ///     Convert <see cref="EngineAttribute" /> to <see cref="CSharpAttribute" />
     /// </summary>
     /// <param name="eAttr">Attribute to convert</param>
-    /// <returns>Converted <see cref="CSharpStruct"/></returns>
+    /// <returns>Converted <see cref="CSharpStruct" /></returns>
     internal static CSharpAttribute ToCSharp(this EngineAttribute eAttr)
     {
         string inlineComment = $"RVA: 0x{eAttr.Rva:X}, Offset: 0x{eAttr.Offset:X}, VA: 0x{eAttr.Va:X}";
 
-        return new CSharpAttribute()
+        return new CSharpAttribute
         {
             Name = eAttr.Name,
             Arguments = eAttr.Arguments,
             Conditions = eAttr.Conditions,
-            InlineComment = inlineComment
+            InlineComment = inlineComment,
         };
     }
 
     /// <summary>
-    /// Convert <see cref="EngineEnum"/> to <see cref="CSharpEnum"/>
+    ///     Convert <see cref="EngineEnum" /> to <see cref="CSharpEnum" />
     /// </summary>
     /// <param name="eEnum">Enum to convert</param>
-    /// <returns>Converted <see cref="CSharpStruct"/></returns>
+    /// <returns>Converted <see cref="CSharpStruct" /></returns>
     internal static CSharpEnum ToCSharp(this EngineEnum eEnum)
     {
-        return new CSharpEnum()
+        return new CSharpEnum
         {
             AccessModifier = eEnum.Modifiers.AccessModifiers.ToString().ToLower(CultureInfo.InvariantCulture),
             Attributes = eEnum.Attributes.Select(ToCSharp).ToList(),
             Name = eEnum.Name,
             Type = eEnum.Type,
-            Values = eEnum.Values.Select(kv => new PackageNameValue()
-                {
-                    Name = kv.Key,
-                    Value = kv.Value
-                }
-            ).ToList(),
+            Values = eEnum.Values.Select(
+                    kv => new PackageNameValue { Name = kv.Key, Value = kv.Value }
+                )
+                .ToList(),
             HexValues = eEnum.HexValues,
             Conditions = eEnum.Conditions,
-            Comments = eEnum.Comments
+            Comments = eEnum.Comments,
         }.WithComment([eEnum.FullName]);
     }
 
     /// <summary>
-    /// Convert <see cref="EngineField"/> to <see cref="CSharpField"/>
+    ///     Convert <see cref="EngineField" /> to <see cref="CSharpField" />
     /// </summary>
     /// <param name="eField">Field to convert</param>
-    /// <returns>Converted <see cref="CSharpField"/></returns>
+    /// <returns>Converted <see cref="CSharpField" /></returns>
     internal static CSharpField ToCSharp(this EngineField eField)
     {
         var inlineComment = new StringBuilder();
@@ -74,7 +71,7 @@ public static class LangPrintHelper
             inlineComment.Append($" {eField.FlagsString}");
         }
 
-        return new CSharpField()
+        return new CSharpField
         {
             AccessModifier = eField.Modifiers.AccessModifiers.ToString().ToLower(CultureInfo.InvariantCulture),
             Attributes = eField.Attributes.Select(ToCSharp).ToList(),
@@ -88,15 +85,15 @@ public static class LangPrintHelper
             IsVolatile = (eField.Modifiers.DeclarationModifiers & EngineItemDeclarationModifier.Volatile) != 0,
             InlineComment = eField.Comment,
             Conditions = eField.Conditions,
-            Comments = eField.Comments
+            Comments = eField.Comments,
         }.WithInlineComment(inlineComment.ToString());
     }
 
     /// <summary>
-    /// Convert <see cref="EngineProperty"/> to <see cref="CSharpProperty"/>
+    ///     Convert <see cref="EngineProperty" /> to <see cref="CSharpProperty" />
     /// </summary>
     /// <param name="eProp">Field to convert</param>
-    /// <returns>Converted <see cref="CSharpProperty"/></returns>
+    /// <returns>Converted <see cref="CSharpProperty" /></returns>
     internal static CSharpProperty ToCSharp(this EngineProperty eProp)
     {
         var inlineComment = new StringBuilder();
@@ -112,7 +109,7 @@ public static class LangPrintHelper
             inlineComment.Append($" {eProp.FlagsString}");
         }
 
-        return new CSharpProperty()
+        return new CSharpProperty
         {
             AccessModifier = eProp.Modifiers.AccessModifiers.ToString().ToLower(CultureInfo.InvariantCulture),
             Attributes = eProp.Attributes.Select(ToCSharp).ToList(),
@@ -128,33 +125,33 @@ public static class LangPrintHelper
             HaveSetter = eProp.HaveSetter,
             InlineComment = eProp.Comment,
             Conditions = eProp.Conditions,
-            Comments = eProp.Comments
+            Comments = eProp.Comments,
         }.WithInlineComment(inlineComment.ToString());
     }
 
     /// <summary>
-    /// Convert <see cref="EngineParameter"/> to <see cref="CSharpParameter"/>
+    ///     Convert <see cref="EngineParameter" /> to <see cref="CSharpParameter" />
     /// </summary>
     /// <param name="param">Parameter to convert</param>
-    /// <returns>Converted <see cref="CSharpParameter"/></returns>
+    /// <returns>Converted <see cref="CSharpParameter" /></returns>
     internal static CSharpParameter ToCSharp(this EngineParameter param)
     {
-        return new CSharpParameter()
+        return new CSharpParameter
         {
             Attributes = param.Attributes.Select(ToCSharp).ToList(),
             Name = param.Name,
             Type = param.Type,
             IsRef = param.IsReference,
             Conditions = param.Conditions,
-            Comments = param.Comments
+            Comments = param.Comments,
         };
     }
 
     /// <summary>
-    /// Convert <see cref="EngineFunction"/> to <see cref="CSharpFunction"/>
+    ///     Convert <see cref="EngineFunction" /> to <see cref="CSharpFunction" />
     /// </summary>
     /// <param name="func">Function to convert</param>
-    /// <returns>Converted <see cref="CSharpStruct"/></returns>
+    /// <returns>Converted <see cref="CSharpStruct" /></returns>
     internal static CSharpFunction ToCSharp(this EngineFunction func)
     {
         List<EngineParameter> @params = func.Parameters
@@ -173,7 +170,7 @@ public static class LangPrintHelper
                 "Function:",
                 $"\t\tRVA    -> 0x{func.Rva:X8}",
                 $"\t\tName   -> {func.FullName}",
-                $"\t\tFlags  -> ({func.FlagsString})"
+                $"\t\tFlags  -> ({func.FlagsString})",
             ];
 
             if (@params.Count > 0)
@@ -191,7 +188,7 @@ public static class LangPrintHelper
             }
         }
 
-        return new CSharpFunction()
+        return new CSharpFunction
         {
             AccessModifier = func.Modifiers.AccessModifiers.ToString().ToLower(CultureInfo.InvariantCulture),
             Attributes = func.Attributes.Select(ToCSharp).ToList(),
@@ -208,24 +205,21 @@ public static class LangPrintHelper
             IsAsync = false,
             IsUnsafe = false,
             Conditions = func.Conditions,
-            Comments = func.Comments
+            Comments = func.Comments,
         }.WithComment(comments);
     }
 
     /// <summary>
-    /// Convert <see cref="EngineStruct"/> to <see cref="CSharpStruct"/>
+    ///     Convert <see cref="EngineStruct" /> to <see cref="CSharpStruct" />
     /// </summary>
     /// <param name="struct">Struct to convert</param>
-    /// <returns>Converted <see cref="CSharpStruct"/></returns>
+    /// <returns>Converted <see cref="CSharpStruct" /></returns>
     internal static CSharpStruct ToCSharp(this EngineStruct @struct)
     {
-        var comments = new List<string>()
-        {
-            @struct.FullName
-        };
+        var comments = new List<string> { @struct.FullName };
         comments.AddRange(@struct.Comments);
 
-        return new CSharpStruct()
+        return new CSharpStruct
         {
             AccessModifier = @struct.Modifiers.AccessModifiers.ToString().ToLower(CultureInfo.InvariantCulture),
             Attributes = @struct.Attributes.Select(ToCSharp).ToList(),
@@ -243,15 +237,15 @@ public static class LangPrintHelper
             IsSealed = (@struct.Modifiers.DeclarationModifiers & EngineItemDeclarationModifier.Sealed) != 0,
             Conditions = @struct.Conditions,
             Comments = comments,
-            InlineComment = $"TypeDefIndex: {@struct.ObjectIndex}"
+            InlineComment = $"TypeDefIndex: {@struct.ObjectIndex}",
         };
     }
 
     /// <summary>
-    /// Convert <see cref="EngineClass"/> to <see cref="CSharpStruct"/>
+    ///     Convert <see cref="EngineClass" /> to <see cref="CSharpStruct" />
     /// </summary>
     /// <param name="class">Class to convert</param>
-    /// <returns>Converted <see cref="CSharpStruct"/></returns>
+    /// <returns>Converted <see cref="CSharpStruct" /></returns>
     internal static CSharpStruct ToCSharp(this EngineClass @class)
     {
         CSharpStruct ret = ((EngineStruct)@class).ToCSharp();
