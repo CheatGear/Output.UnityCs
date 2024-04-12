@@ -29,41 +29,19 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
 
     protected override Dictionary<string, string> LangTypes { get; } = new()
     {
-        {
-            "int64_t", "long"
-        },
-        {
-            "int32_t", "int"
-        },
-        {
-            "int16_t", "short"
-        },
-        {
-            "int8_t", "sbyte"
-        },
+        { "int64_t", "long" },
+        { "int32_t", "int" },
+        { "int16_t", "short" },
+        { "int8_t", "sbyte" },
 
-        {
-            "uint64_t", "ulong"
-        },
-        {
-            "uint32_t", "uint"
-        },
-        {
-            "uint16_t", "ushort"
-        },
-        {
-            "uint8_t", "byte"
-        },
+        { "uint64_t", "ulong" },
+        { "uint32_t", "uint" },
+        { "uint16_t", "ushort" },
+        { "uint8_t", "byte" },
 
-        {
-            "intptr_t", "IntPtr"
-        },
-        {
-            "Il2CppString", "string"
-        },
-        {
-            "Il2CppObject", "Object"
-        }
+        { "intptr_t", "IntPtr" },
+        { "Il2CppString", "string" },
+        { "Il2CppObject", "Object" }
     };
 
     public override string OutputName => "CSharp";
@@ -173,10 +151,11 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
         return enginePackage.Structs
             .Where(ec => !ec.IsSubType)
             .Select(eStruct =>
-            {
-                PrepareStruct(eStruct);
-                return eStruct.ToCSharp();
-            });
+                {
+                    PrepareStruct(eStruct);
+                    return eStruct.ToCSharp();
+                }
+            );
     }
 
     private IEnumerable<CSharpStruct> GetClasses(UnityPackage enginePackage)
@@ -184,10 +163,11 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
         return enginePackage.Classes
             .Where(ec => !ec.IsSubType)
             .Select(eStruct =>
-            {
-                PrepareStruct(eStruct);
-                return eStruct.ToCSharp();
-            });
+                {
+                    PrepareStruct(eStruct);
+                    return eStruct.ToCSharp();
+                }
+            );
     }
 
     /// <summary>
@@ -219,11 +199,11 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
             Name = unityPack.Name,
             //BeforeNameSpace = $"#ifdef _MSC_VER{Environment.NewLine}\t#pragma pack(push, 0x{SdkFile.GlobalMemberAlignment:X2}){Environment.NewLine}#endif",
             //AfterNameSpace = $"#ifdef _MSC_VER{Environment.NewLine}\t#pragma pack(pop){Environment.NewLine}#endif",
-            HeadingComment = new List<string>()
-            {
+            HeadingComment =
+            [
                 $"Name: {SdkFile.GameName}",
                 $"Version: {SdkFile.GameVersion}"
-            },
+            ],
             NameSpace = SdkFile.Namespace,
             Enums = GetEnums(unityPack).ToList(),
             Structs = structs,

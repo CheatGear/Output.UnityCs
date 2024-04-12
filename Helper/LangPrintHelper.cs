@@ -42,11 +42,16 @@ public static class LangPrintHelper
             Attributes = eEnum.Attributes.Select(ToCSharp).ToList(),
             Name = eEnum.Name,
             Type = eEnum.Type,
-            Values = eEnum.Values.Select(kv => new PackageNameValue() { Name = kv.Key, Value = kv.Value }).ToList(),
+            Values = eEnum.Values.Select(kv => new PackageNameValue()
+                {
+                    Name = kv.Key,
+                    Value = kv.Value
+                }
+            ).ToList(),
             HexValues = eEnum.HexValues,
             Conditions = eEnum.Conditions,
             Comments = eEnum.Comments
-        }.WithComment(new List<string>() { eEnum.FullName });
+        }.WithComment([eEnum.FullName]);
     }
 
     /// <summary>
@@ -155,13 +160,13 @@ public static class LangPrintHelper
         }
         else
         {
-            comments = new List<string>()
-            {
+            comments =
+            [
                 "Function:",
                 $"\t\tRVA    -> 0x{func.Rva:X8}",
                 $"\t\tName   -> {func.FullName}",
                 $"\t\tFlags  -> ({func.FlagsString})"
-            };
+            ];
 
             if (@params.Count > 0)
                 comments.Add("Parameters:");
