@@ -22,7 +22,13 @@ internal enum CppOptions
     PrecompileSyntax
 }
 
-[PluginInfo(Name = nameof(UnityCSharp), Version = "5.0.0", Author = "CorrM", Description = "CSharp syntax support for Unity", WebsiteLink = "https://github.com/CheatGear", SourceCodeLink = "https://github.com/CheatGear/Output.UnityCs")]
+[PluginInfo(Name = nameof(UnityCSharp),
+    Version = "5.0.0",
+    Author = "CorrM",
+    Description = "CSharp syntax support for Unity",
+    WebsiteLink = "https://github.com/CheatGear",
+    SourceCodeLink = "https://github.com/CheatGear/Output.UnityCs"
+)]
 public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
 {
     private readonly CSharpProcessor _cSharpProcessor;
@@ -70,7 +76,9 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
     private string FixArrayTypeName(string type)
     {
         if (type.EndsWith("_Array"))
+        {
             return type[..^"_Array".Length] + "[]";
+        }
 
         return type;
     }
@@ -98,19 +106,27 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
     private void FixTypes(EngineFunction eFunc)
     {
         foreach (EngineParameter engineParameter in eFunc.Parameters)
+        {
             FixTypes(engineParameter);
+        }
     }
 
     private void FixTypes(EngineStruct eStruct)
     {
         foreach (EngineField eStructField in eStruct.Fields)
+        {
             FixTypes(eStructField);
+        }
 
         foreach (EngineProperty eStructProp in eStruct.Properties)
+        {
             FixTypes(eStructProp);
+        }
 
         foreach (EngineFunction eStructFunc in eStruct.Methods)
+        {
             FixTypes(eStructFunc);
+        }
     }
 
     private void PrepareStruct(EngineStruct eStruct)
@@ -119,16 +135,22 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
         {
             (string key, string value) = eStruct.Supers.First();
             if (value is "UObject" or "Il2CppObject")
+            {
                 eStruct.Supers.Remove(key);
+            }
         }
 
         int getTypeInfoIdx = eStruct.Methods.FindIndex(m => m.Name == "GetTypeInfo");
         if (getTypeInfoIdx != -1)
+        {
             eStruct.Methods.RemoveAt(getTypeInfoIdx);
+        }
 
         int getKlassIdx = eStruct.Methods.FindIndex(m => m.Name == "GetKlass");
         if (getKlassIdx != -1)
+        {
             eStruct.Methods.RemoveAt(getKlassIdx);
+        }
     }
 
     private IEnumerable<CSharpEnum> GetEnums(UnityPackage enginePackage)
@@ -185,7 +207,9 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
 #endif
 
         if (unityPack.IsPredefined)
+        {
             return new Dictionary<string, string>();
+        }
 
         var ret = new Dictionary<string, string>();
 
@@ -213,7 +237,9 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
         // Generate files
         Dictionary<string, string> cppFiles = _cSharpProcessor.GenerateFiles(cppPackage);
         foreach ((string fName, string fContent) in cppFiles)
+        {
             ret.Add(fName, fContent);
+        }
 
         return ret;
     }
@@ -282,13 +308,19 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
         foreach (UnityPackage pack in SdkFile.Packages)
         {
             foreach (EngineEnum engineEnum in pack.Enums)
+            {
                 FixTypes(engineEnum);
+            }
 
             foreach (EngineClass engineClass in pack.Classes)
+            {
                 FixTypes(engineClass);
+            }
 
             foreach (EngineStruct engineStruct in pack.Structs)
+            {
                 FixTypes(engineStruct);
+            }
         }
 
         return ValueTask.CompletedTask;
@@ -328,7 +360,9 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
         foreach (UnityPackage pack in SdkFile.Packages)
         {
             foreach ((string fName, string fContent) in await GeneratePackageFilesAsync(pack).ConfigureAwait(false))
+            {
                 await FileManager.WriteAsync(saveDirPath, fName, fContent).ConfigureAwait(false);
+            }
 
             if (Status?.ProgressbarStatus is not null)
             {
@@ -348,16 +382,21 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
             await FileManager.WriteAsync(saveDirPath, fName, fContent).ConfigureAwait(false);
 
             if (!fName.EndsWith(".cpp") && fName.ToLower() != "pch.h")
+            {
                 builder.AppendLine($"#include \"{fName.Replace("\\", "/")}\"");
+            }
         }
 
         builder.Append(Environment.NewLine);
 
         // Package sorter
         if (Status?.TextStatus is not null)
+        {
             await Status.TextStatus.Invoke("Sort packages depend on dependencies").ConfigureAwait(false);
+        }
 
-        PackageSorterResult<IEnginePackage> sortResult = PackageSorter.Sort(SdkFile.Packages.Cast<IEnginePackage>().ToList());
+        PackageSorterResult<IEnginePackage> sortResult =
+            PackageSorter.Sort(SdkFile.Packages.Cast<IEnginePackage>().ToList());
         if (sortResult.CycleList.Count > 0)
         {
             builder.AppendLine("// # Dependency cycle headers");
@@ -374,10 +413,14 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
         }
 
         foreach (IEnginePackage package in sortResult.SortedList.Where(p => p.IsPredefined))
+        {
             builder.AppendLine($"#include \"SDK/{package.Name}_Package.h\"");
+        }
 
         foreach (IEnginePackage package in sortResult.SortedList.Where(p => !p.IsPredefined))
+        {
             builder.AppendLine($"#include \"SDK/{package.Name}_Package.h\"");
+        }
 
         await FileManager.WriteAsync(saveDirPath, "SDK.h", builder.ToString()).ConfigureAwait(false);
     }

@@ -65,10 +65,14 @@ public static class LangPrintHelper
         inlineComment.Append($"0x{eField.Offset:X4}");
 
         if (!string.IsNullOrEmpty(eField.Comment))
+        {
             inlineComment.Append($" {eField.Comment}");
+        }
 
         if (!string.IsNullOrEmpty(eField.FlagsString))
+        {
             inlineComment.Append($" {eField.FlagsString}");
+        }
 
         return new CSharpField()
         {
@@ -99,10 +103,14 @@ public static class LangPrintHelper
         inlineComment.Append($"0x{eProp.Offset:X4}");
 
         if (!string.IsNullOrEmpty(eProp.Comment))
+        {
             inlineComment.Append($" {eProp.Comment}");
+        }
 
         if (!string.IsNullOrEmpty(eProp.FlagsString))
+        {
             inlineComment.Append($" {eProp.FlagsString}");
+        }
 
         return new CSharpProperty()
         {
@@ -169,7 +177,9 @@ public static class LangPrintHelper
             ];
 
             if (@params.Count > 0)
+            {
                 comments.Add("Parameters:");
+            }
 
             foreach (EngineParameter param in @params)
             {
