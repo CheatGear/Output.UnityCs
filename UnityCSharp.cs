@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CG.Output.UnityCSharp.Helper;
+using CG.Output.Helper;
 using CG.SDK.Dotnet.Attributes;
 using CG.SDK.Dotnet.Engine;
 using CG.SDK.Dotnet.Engine.Models;
@@ -13,7 +13,7 @@ using CG.SDK.Dotnet.Plugin.Output;
 using LangPrint;
 using LangPrint.CSharp;
 
-namespace CG.Output.UnityCSharp;
+namespace CG.Output;
 
 // TODO: `RuntimeRemoteClassHandle.value` type should be `RuntimeStructs_RemoteClass*`
 

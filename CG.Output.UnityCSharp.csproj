@@ -3,8 +3,9 @@
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <AssemblyName>UnityCSharp</AssemblyName>
-        <RootNamespace>CG.Output.UnityCSharp</RootNamespace>
+        <RootNamespace>CG.Output</RootNamespace>
         <Nullable>enable</Nullable>
+        <LangVersion>default</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>

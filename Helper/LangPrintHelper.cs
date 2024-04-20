@@ -7,7 +7,7 @@ using CG.SDK.Dotnet.Helper;
 using LangPrint;
 using LangPrint.CSharp;
 
-namespace CG.Output.UnityCSharp.Helper;
+namespace CG.Output.Helper;
 
 public static class LangPrintHelper
 {
@@ -43,7 +43,11 @@ public static class LangPrintHelper
             Name = eEnum.Name,
             Type = eEnum.Type,
             Values = eEnum.Values.Select(
-                    kv => new PackageNameValue { Name = kv.Key, Value = kv.Value }
+                    kv => new PackageNameValue
+                    {
+                        Name = kv.Key,
+                        Value = kv.Value
+                    }
                 )
                 .ToList(),
             HexValues = eEnum.HexValues,
