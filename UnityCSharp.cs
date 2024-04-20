@@ -63,7 +63,8 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
     public override IReadOnlyDictionary<Enum, OutputOption> Options { get; } = new Dictionary<Enum, OutputOption>
     {
         {
-            CppOptions.PrecompileSyntax, new OutputOption(
+            CppOptions.PrecompileSyntax,
+            new OutputOption(
                 "Precompile Syntax",
                 OutputOptionType.CheckBox,
                 "Use precompile headers for most build speed",
@@ -169,8 +170,7 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
 
     private IEnumerable<CSharpStruct> GetStructs(UnityPackage enginePackage)
     {
-        return enginePackage.Structs
-            .Where(ec => !ec.IsSubType)
+        return enginePackage.Structs.Where(ec => !ec.IsSubType)
             .Select(
                 eStruct =>
                 {
@@ -182,8 +182,7 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
 
     private IEnumerable<CSharpStruct> GetClasses(UnityPackage enginePackage)
     {
-        return enginePackage.Classes
-            .Where(ec => !ec.IsSubType)
+        return enginePackage.Classes.Where(ec => !ec.IsSubType)
             .Select(
                 eStruct =>
                 {
@@ -363,11 +362,7 @@ public sealed class UnityCSharp : OutputPlugin<UnitySdkFile>
 
             if (Status?.ProgressbarStatus is not null)
             {
-                await Status.ProgressbarStatus.Invoke(
-                        "",
-                        packCount,
-                        SdkFile.Packages.Count - packCount
-                    )
+                await Status.ProgressbarStatus.Invoke("", packCount, SdkFile.Packages.Count - packCount)
                     .ConfigureAwait(false);
             }
 

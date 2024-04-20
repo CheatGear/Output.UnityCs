@@ -46,7 +46,7 @@ public static class LangPrintHelper
                     kv => new PackageNameValue
                     {
                         Name = kv.Key,
-                        Value = kv.Value
+                        Value = kv.Value,
                     }
                 )
                 .ToList(),
@@ -159,9 +159,7 @@ public static class LangPrintHelper
     /// <returns>Converted <see cref="CSharpStruct" /></returns>
     internal static CSharpFunction ToCSharp(this EngineFunction func)
     {
-        List<EngineParameter> @params = func.Parameters
-            .Where(p => !p.IsReturn)
-            .ToList();
+        List<EngineParameter> @params = func.Parameters.Where(p => !p.IsReturn).ToList();
 
         List<string> comments;
         if (!func.Comments.IsEmpty())
